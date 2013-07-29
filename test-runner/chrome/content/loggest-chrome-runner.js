@@ -816,6 +816,20 @@ function printTestSummary(summary) {
   });
 }
 
+function getTestResult(summaries) {
+  var result = 'success';
+
+  summaries.forEach(function(summary) {
+    summary.tests.forEach(function(test) {
+      if (test.result !== 'pass') {
+        result = 'failure';
+      }
+    });
+  });
+
+  return result;
+}
+
 // Progress listeners are held weakref'ed, so we need to maintain a strong
 // reference here or it can go away prematurely!
 var gProgress = null;
@@ -1172,6 +1186,11 @@ function DOMLoaded() {
           printTestSummary(summary);
         });
         dump('\n************************\n\n');
+
+        var testResult = getTestResult(summaries);
+        var jsonString = JSON.stringify({ result: testResult });
+        writeTestLog('test', 'result', jsonString);
+
         quitApp();
       });
     }
